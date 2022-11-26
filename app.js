@@ -7,7 +7,7 @@ const port = process.env.PORT || 3000
 // 註冊 Handlebars 樣板引擎，並指定副檔名為 .hbs
 app.engine('hbs', handlebars({ extname: '.hbs' }))
 //  使用handlebars設為樣板引擎
-app.set('engine view', 'hbs')
+app.set('view engine', 'hbs')
 
 app.use(routes)
 
