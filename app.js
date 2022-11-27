@@ -5,6 +5,7 @@ const express = require('express')
 const handlebars = require('express-handlebars')
 const flash = require('connect-flash')
 const session = require('express-session')
+const passport = require('./config/passport')
 const routes = require('./routes')
 
 const app = express()
@@ -16,6 +17,7 @@ require('./models')
 app.engine('hbs', handlebars({ extname: '.hbs' }))
 //  使用handlebars設為樣板引擎
 app.set('view engine', 'hbs')
+//  使用body parser
 app.use(express.urlencoded({ extended: true }))
 
 //  設定session
@@ -24,6 +26,10 @@ app.use(session({
   resave: false,
   saveUninitialized: false
 }))
+
+// 設定Passport初始化, 啟用session功能
+app.use(passport.initialize())
+app.use(passport.session())
 
 //  使用flash
 app.use(flash())
