@@ -1,5 +1,6 @@
 const { Restaurant, sequelize } = require('../models')
 const { QueryTypes } = require('sequelize')
+const { localFileHandler } = require('../helpers/file-helpers')
 
 const adminController = {
   getRestaurants: async (req, res, next) => {
@@ -24,12 +25,15 @@ const adminController = {
     try {
       const { name, tel, address, openingHours, description } = req.body
       if (!name) throw new Error('Restaurant name is required!')
+      const { file } = req // multer 處理完會放在 req.file
+      const filePath = await localFileHandler(file)
       await Restaurant.create({
         name,
         tel,
         address,
         openingHours,
-        description
+        description,
+        image: filePath || null
       })
       req.flash('success_messages', 'restaurant was successfully created')
       res.redirect('/admin/restaurants')
@@ -62,20 +66,20 @@ const adminController = {
       const { id } = req.params
       const { name, tel, address, openingHours, description } = req.body
       if (!name) throw new Error('Restaurant name is required!')
-      await sequelize.query(
-        `
-        UPDATE Restaurants SET
-        name = '${name}',
-        tel = '${tel}',
-        address = '${address}',
-        opening_hours = '${openingHours}',
-        description = '${description}'
-        WHERE id = '${id}'
-        `,
-        {
-          type: QueryTypes.UPDATE
-        }
-      )
+      const { file } = req
+      const [restaurant, filePath] = await Promise.all([
+        Restaurant.findByPk(id), // 去資料庫查有沒有這間餐廳
+        localFileHandler(file) // 把檔案傳到 file-helper 處理
+      ])
+      if (!restaurant) throw new Error("Restaurant didn't exist!")
+      await restaurant.update({
+        name,
+        tel,
+        address,
+        openingHours,
+        description,
+        image: filePath || restaurant.image // 如果 filePath 是 Truthy (使用者有上傳新照片) 就用 filePath，是 Falsy (使用者沒有上傳新照片) 就沿用原本資料庫內的值
+      })
 
       req.flash('success_messages', 'restaurant was successfully to update')
       res.redirect('/admin/restaurants')
