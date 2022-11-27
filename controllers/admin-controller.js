@@ -71,10 +71,30 @@ const adminController = {
         opening_hours = '${openingHours}',
         description = '${description}'
         WHERE id = '${id}'
-        `
+        `,
+        {
+          type: QueryTypes.UPDATE
+        }
       )
 
       req.flash('success_messages', 'restaurant was successfully to update')
+      res.redirect('/admin/restaurants')
+    } catch (err) {
+      next(err)
+    }
+  },
+  deleteRestaurant: async (req, res, next) => {
+    try {
+      const { id } = req.params
+      await sequelize.query(
+        `
+        DELETE FROM Restaurants
+        WHERE id = '${id}'
+        `,
+        {
+          type: QueryTypes.DELETE
+        }
+      )
       res.redirect('/admin/restaurants')
     } catch (err) {
       next(err)
