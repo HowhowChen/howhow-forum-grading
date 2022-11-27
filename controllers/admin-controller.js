@@ -41,8 +41,41 @@ const adminController = {
     try {
       const { id } = req.params
       const restaurant = await Restaurant.findByPk(id, { raw: true })
-      if (restaurant.length === 0) throw new Error("Restaurant didn't exist!")
+      if (!restaurant) throw new Error("Restaurant didn't exist!")
       res.render('admin/restaurant', { restaurant })
+    } catch (err) {
+      next(err)
+    }
+  },
+  editRestaurant: async (req, res, next) => {
+    try {
+      const { id } = req.params
+      const restaurant = await Restaurant.findByPk(id, { raw: true })
+      if (!restaurant) throw new Error("Restaurant didn't exist!")
+      res.render('admin/edit-restaurant', { restaurant })
+    } catch (err) {
+      next(err)
+    }
+  },
+  putRestaurant: async (req, res, next) => {
+    try {
+      const { id } = req.params
+      const { name, tel, address, openingHours, description } = req.body
+      if (!name) throw new Error('Restaurant name is required!')
+      await sequelize.query(
+        `
+        UPDATE Restaurants SET
+        name = '${name}',
+        tel = '${tel}',
+        address = '${address}',
+        opening_hours = '${openingHours}',
+        description = '${description}'
+        WHERE id = '${id}'
+        `
+      )
+
+      req.flash('success_messages', 'restaurant was successfully to update')
+      res.redirect('/admin/restaurants')
     } catch (err) {
       next(err)
     }
