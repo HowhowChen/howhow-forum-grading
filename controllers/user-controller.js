@@ -16,7 +16,7 @@ const userController = {
         }
       )
 
-      if (user) throw new Error('Email already exists')
+      if (user.length !== 0) throw new Error('Email already exists')
       const hash = await bcrypt.hash(password, 10)
       await User.create({
         name,
