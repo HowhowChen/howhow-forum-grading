@@ -1,6 +1,6 @@
 const { Restaurant, sequelize } = require('../models')
 const { QueryTypes } = require('sequelize')
-const { localFileHandler } = require('../helpers/file-helpers')
+const { imgurFileHandler } = require('../helpers/file-helpers')
 
 const adminController = {
   getRestaurants: async (req, res, next) => {
@@ -26,7 +26,7 @@ const adminController = {
       const { name, tel, address, openingHours, description } = req.body
       if (!name) throw new Error('Restaurant name is required!')
       const { file } = req // multer 處理完會放在 req.file
-      const filePath = await localFileHandler(file)
+      const filePath = await imgurFileHandler(file)
       await Restaurant.create({
         name,
         tel,
@@ -69,7 +69,7 @@ const adminController = {
       const { file } = req
       const [restaurant, filePath] = await Promise.all([
         Restaurant.findByPk(id), // 去資料庫查有沒有這間餐廳
-        localFileHandler(file) // 把檔案傳到 file-helper 處理
+        imgurFileHandler(file) // 把檔案傳到 file-helper 處理
       ])
       if (!restaurant) throw new Error("Restaurant didn't exist!")
       await restaurant.update({
