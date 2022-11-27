@@ -11,6 +11,7 @@ require('./models')
 app.engine('hbs', handlebars({ extname: '.hbs' }))
 //  使用handlebars設為樣板引擎
 app.set('view engine', 'hbs')
+app.use(express.urlencoded({ extended: true }))
 
 app.use(routes)
 
