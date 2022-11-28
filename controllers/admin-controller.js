@@ -1,4 +1,4 @@
-const { Restaurant, sequelize } = require('../models')
+const { User, Restaurant, sequelize } = require('../models')
 const { QueryTypes } = require('sequelize')
 const { imgurFileHandler } = require('../helpers/file-helpers')
 
@@ -93,13 +93,42 @@ const adminController = {
       await sequelize.query(
         `
         DELETE FROM Restaurants
-        WHERE id = '${id}'
+        WHERE id = :id
         `,
         {
+          replacements: { id: id },
           type: QueryTypes.DELETE
         }
       )
       res.redirect('/admin/restaurants')
+    } catch (err) {
+      next(err)
+    }
+  },
+  getUsers: async (req, res, next) => {
+    try {
+      const users = await User.findAll({
+        raw: true
+      })
+      res.render('admin/users', { users })
+    } catch (err) {
+      next(err)
+    }
+  },
+  patchUser: async (req, res, next) => {
+    try {
+      const { id } = req.params
+      const user = await User.findByPk(id)
+      if (!user) throw new Error("User didn't exists!")
+      if (user.email === 'root@example.com') {
+        req.flash('error_messages', '禁止變更 root 權限')
+        return res.redirect('back')
+      }
+      await user.update({
+        isAdmin: !user.isAdmin
+      })
+      req.flash('success_messages', '使用者權限變更成功')
+      res.redirect('/admin/users')
     } catch (err) {
       next(err)
     }
