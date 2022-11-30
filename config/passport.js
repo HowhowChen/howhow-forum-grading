@@ -17,7 +17,7 @@ passport.use(new LocalStrategy(
     const user = await User.findOne({ where: { email } })
     if (!user) return callback(null, false, req.flash('error_messages', '帳號或密碼輸入錯誤'))
     // password can not match
-    const isMatch = bcrypt.compare(password, req.body.password)
+    const isMatch = await bcrypt.compare(password, user.password)
     if (!isMatch) return callback(null, false, req.flash('error_messages', '帳號或密碼輸入錯誤'))
     // no error
     callback(null, user)
