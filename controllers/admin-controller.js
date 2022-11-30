@@ -1,18 +1,15 @@
-const { User, Restaurant, sequelize } = require('../models')
+const { User, Restaurant, Category, sequelize } = require('../models')
 const { QueryTypes } = require('sequelize')
 const { imgurFileHandler } = require('../helpers/file-helpers')
 
 const adminController = {
   getRestaurants: async (req, res, next) => {
     try {
-      const restaurants = await sequelize.query(
-        `
-        SELECT * FROM Restaurants
-        `,
-        {
-          type: QueryTypes.SELECT
-        }
-      )
+      const restaurants = await Restaurant.findAll({
+        raw: true,
+        nest: true,
+        include: [Category]
+      })
       res.render('admin/restaurants', { restaurants })
     } catch (err) {
       next(err)
@@ -44,7 +41,11 @@ const adminController = {
   getRestaurant: async (req, res, next) => {
     try {
       const { id } = req.params
-      const restaurant = await Restaurant.findByPk(id, { raw: true })
+      const restaurant = await Restaurant.findByPk(id, {
+        raw: true,
+        nest: true,
+        include: [Category]
+      })
       if (!restaurant) throw new Error("Restaurant didn't exist!")
       res.render('admin/restaurant', { restaurant })
     } catch (err) {
