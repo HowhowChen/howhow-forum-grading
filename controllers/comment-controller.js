@@ -20,6 +20,17 @@ const commentController = {
     } catch (err) {
       next(err)
     }
+  },
+  deleteComment: async (req, res, next) => {
+    try {
+      const { id } = req.params
+      const comment = await Comment.findByPk(id)
+      if (!comment) throw new Error("Comment didn't exists!")
+      const deletedComment = await comment.destroy()
+      res.redirect(`/restaurants/${deletedComment.restaurantId}`)
+    } catch (err) {
+      next(err)
+    }
   }
 }
 
