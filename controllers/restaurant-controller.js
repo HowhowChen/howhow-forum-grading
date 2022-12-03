@@ -22,9 +22,13 @@ const restaurantController = {
         }),
         Category.findAll({ raw: true })
       ])
+      const favoritedRestaurantsId = req.user && req.user.FavoritedRestaurants.map(fr => ( // 先確認req.user是否存在
+        fr.id
+      ))
       const data = restaurants.rows.map(r => ({
         ...r,
-        description: r.description.substring(0, 50)
+        description: r.description.substring(0, 50),
+        isFavorited: favoritedRestaurantsId.includes(r.id)
       }))
       res.render('restaurants', {
         restaurants: data,
@@ -42,13 +46,18 @@ const restaurantController = {
       const restaurant = await Restaurant.findByPk(id, {
         include: [
           Category,
-          { model: Comment, include: [User] } //  eager loading
+          { model: Comment, include: [User] }, //  eager loading
+          { model: User, as: 'FavoritedUsers' }
         ],
         order: [['createdAt', 'DESC']]
       })
       if (!restaurant) throw new Error("Restaurant didn't exist!")
       await restaurant.increment('viewCounts', { by: 1 })
-      res.render('restaurant', { restaurant: restaurant.toJSON() })
+      const isFavorited = restaurant.FavoritedUsers.some(f => f.id === req.user.id) // 只要符合條件就會立刻回傳true
+      res.render('restaurant', {
+        restaurant: restaurant.toJSON(),
+        isFavorited
+      })
     } catch (err) {
       next(err)
     }
