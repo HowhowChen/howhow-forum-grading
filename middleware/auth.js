@@ -12,5 +12,14 @@ module.exports = {
     } else {
       res.redirect('/signin')
     }
+  },
+  authenticatedUser: (req, res, next) => {
+    const { id } = req.params
+    if (helpers.ensureAuthenticated(req)) {
+      if (helpers.getUser(req).id === Number(id)) return next()
+      res.redirect(`/users/${id}`)
+    } else {
+      res.redirect('/signin')
+    }
   }
 }
