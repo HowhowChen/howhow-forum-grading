@@ -43,7 +43,8 @@ const restaurantController = {
         include: [
           Category,
           { model: Comment, include: [User] } //  eager loading
-        ]
+        ],
+        order: [[Comment, 'createdAt', 'DESC']]
       })
       if (!restaurant) throw new Error("Restaurant didn't exist!")
       await restaurant.increment('viewCounts', { by: 1 })
@@ -58,7 +59,7 @@ const restaurantController = {
       const restaurant = await Restaurant.findByPk(id, {
         include: [
           Category,
-          { model: Comment }
+          { model: Comment } // join table
         ]
       })
 
