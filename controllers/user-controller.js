@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs')
-const { User, sequelize } = require('../models')
+const { Comment, Restaurant, User, sequelize } = require('../models')
 const { QueryTypes } = require('sequelize')
 const { imgurFileHandler } = require('../helpers/file-helpers')
 const { getUser } = require('../helpers/auth-helpers')
@@ -48,16 +48,28 @@ const userController = {
     try {
       const { id } = req.params
       const user = getUser(req)
-      const userProfile = await User.findByPk(id, {
-        raw: true
-      })
+
+      const [userProfile, comments] = await Promise.all([
+        User.findByPk(id, {
+          raw: true
+        }),
+        Comment.findAll({
+          attributes: ['restaurantId'],
+          where: { userId: id },
+          group: 'restaurantId',
+          include: [Restaurant],
+          raw: true,
+          nest: true
+        })
+      ])
       if (!userProfile) throw new Error("User doesn't exist.")
       delete userProfile.password
       delete user.password
 
       res.render('users/profile', {
         user: getUser(req),
-        userProfile
+        userProfile,
+        comments
       })
     } catch (err) {
       next(err)
