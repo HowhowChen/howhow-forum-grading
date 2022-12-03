@@ -44,7 +44,7 @@ const restaurantController = {
           Category,
           { model: Comment, include: [User] } //  eager loading
         ],
-        order: [[Comment, 'createdAt', 'DESC']]
+        order: [['createdAt', 'DESC']]
       })
       if (!restaurant) throw new Error("Restaurant didn't exist!")
       await restaurant.increment('viewCounts', { by: 1 })
@@ -65,6 +65,44 @@ const restaurantController = {
 
       if (!restaurant) throw new Error("Restaurant didn't exist!")
       res.render('dashboard', { restaurant: restaurant.toJSON() })
+    } catch (err) {
+      next(err)
+    }
+  },
+  getFeeds: async (req, res, next) => {
+    try {
+      const [restaurants, comments] = await Promise.all([
+        Restaurant.findAll({
+          order: [['createdAt', 'DESC']],
+          include: [Category],
+          limit: 10,
+          raw: true,
+          nest: true
+        }),
+        Comment.findAll({
+          order: [['createdAt', 'DESC']],
+          include: [
+            User,
+            Restaurant,
+            { model: Restaurant, include: [Category] } // let Restaurant join Category
+          ],
+          limit: 10,
+          raw: true,
+          nest: true
+        })
+      ])
+      const restaurantsData = restaurants.map(restaurantData => ({
+        ...restaurantData,
+        description: restaurantData.description.substring(0, 50) + '...'
+      }))
+      const commentsData = comments.map(commentData => ({
+        ...commentData,
+        text: commentData.text.substring(0, 50) + '...'
+      }))
+      res.render('feeds', {
+        restaurants: restaurantsData,
+        comments: commentsData
+      })
     } catch (err) {
       next(err)
     }
