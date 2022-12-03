@@ -10,8 +10,14 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate (models) {
-      Restaurant.belongsTo(models.Category, { foreignKey: 'categoryId' })
-      Restaurant.hasMany(models.Comment, { foreignKey: 'restaurantId' })
+      Restaurant.belongsTo(models.Category, { foreignKey: 'categoryId' }) //  建立多對一關係
+      Restaurant.hasMany(models.Comment, { foreignKey: 'restaurantId' }) //  建立一對多關係
+      //  建立多對多關係
+      Restaurant.belongsToMany(models.User, {
+        through: models.Favorite, // 透過Favorite table 做紀錄
+        foreignKey: 'restaurantId',
+        as: 'FavoritedUsers' // 以restaurantId 去找，找出使用者
+      })
     }
   };
   Restaurant.init({
