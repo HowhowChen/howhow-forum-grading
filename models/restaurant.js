@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
       //  建立多對多關係
       Restaurant.belongsToMany(models.User, {
         through: models.Favorite, // 透過Favorite table 做紀錄
-        foreignKey: 'restaurantId',
+        foreignKey: 'restaurantId', // 設定FK
         as: 'FavoritedUsers' // 以restaurantId 去找，找出使用者
       })
     }
