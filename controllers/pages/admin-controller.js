@@ -20,7 +20,6 @@ const adminController = {
     adminServices.postRestaurant(req, (err, data) => {
       if (err) return next(err)
       req.flash('success_messages', 'restaurant was successfully created')
-      res.redirect('/admin/restaurants', data)
       req.session.createData = data
       res.redirect('/admin/restaurants')
     })

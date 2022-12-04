@@ -1,6 +1,5 @@
-const bcrypt = require('bcryptjs')
-const { Comment, Restaurant, User, Favorite, Like, Followship, sequelize } = require('../../models')
-const { QueryTypes } = require('sequelize')
+const userServices = require('../../services/user-services')
+const { Comment, Restaurant, User, Favorite, Like, Followship } = require('../../models')
 const { imgurFileHandler } = require('../../helpers/file-helpers')
 const { getUser } = require('../../helpers/auth-helpers')
 
@@ -9,28 +8,12 @@ const userController = {
     res.render('signup')
   },
   signUp: async (req, res, next) => {
-    try {
-      const { name, email, password } = req.body
-      const user = await sequelize.query(
-        `SELECT * FROM Users
-        WHERE email = '${email}'`,
-        {
-          type: QueryTypes.SELECT
-        }
-      )
-
-      if (user.length !== 0) throw new Error('Email already exists')
-      const hash = await bcrypt.hash(password, 10)
-      await User.create({
-        name,
-        email,
-        password: hash
-      })
+    userServices.signUp(req, (err, data) => {
+      if (err) return next(err)
       req.flash('success_messages', '成功註冊帳號!')
+      req.session.newUser = data
       res.redirect('/signin')
-    } catch (err) {
-      next(err)
-    }
+    })
   },
   signInPage: (req, res) => {
     res.render('signin')
