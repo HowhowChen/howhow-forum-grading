@@ -1,6 +1,6 @@
-const { User, Restaurant, Category, sequelize } = require('../models')
+const { User, Restaurant, Category, sequelize } = require('../../models')
 const { QueryTypes } = require('sequelize')
-const { imgurFileHandler } = require('../helpers/file-helpers')
+const { imgurFileHandler } = require('../../helpers/file-helpers')
 
 const adminController = {
   getRestaurants: async (req, res, next) => {
