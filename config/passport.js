@@ -1,5 +1,6 @@
 const passport = require('passport')
 const LocalStrategy = require('passport-local')
+const passportJWT = require('passport-jwt')
 const bcrypt = require('bcryptjs')
 const { User, Restaurant } = require('../models')
 
@@ -44,5 +45,29 @@ passport.deserializeUser(async (id, callback) => {
     callback(err)
   }
 })
+
+const JWTStrategy = passportJWT.Strategy
+const ExtractJWT = passportJWT.ExtractJwt
+
+const jwtOptions = {
+  jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env.JWT_SECRET
+}
+
+passport.use(new JWTStrategy(jwtOptions, async (jwtPayload, callback) => {
+  try {
+    const user = await User.findByPk(jwtPayload.id, {
+      include: [
+        { model: Restaurant, as: 'FavoritedRestaurants' }, // as標明我們在model裡面設定的關係
+        { model: Restaurant, as: 'LikedRestaurants' },
+        { model: User, as: 'Followers' },
+        { model: User, as: 'Followings' }
+      ]
+    })
+    callback(null, user)
+  } catch (err) {
+    callback(err)
+  }
+}))
 
 module.exports = passport
