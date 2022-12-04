@@ -75,10 +75,10 @@ const restaurantController = {
       const restaurant = await Restaurant.findByPk(id, {
         include: [
           Category,
-          { model: Comment } // join table
+          { model: Comment }, // join table
+          { model: User, as: 'FavoritedUsers' }
         ]
       })
-
       if (!restaurant) throw new Error("Restaurant didn't exist!")
       res.render('dashboard', { restaurant: restaurant.toJSON() })
     } catch (err) {
