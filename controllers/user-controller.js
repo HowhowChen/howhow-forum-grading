@@ -51,7 +51,11 @@ const userController = {
 
       const [userProfile, comments] = await Promise.all([
         User.findByPk(id, {
-          raw: true
+          include: [
+            { model: Restaurant, as: 'FavoritedRestaurants' },
+            { model: User, as: 'Followers' },
+            { model: User, as: 'Followings' }
+          ]
         }),
         Comment.findAll({
           attributes: ['restaurantId'],
@@ -68,7 +72,7 @@ const userController = {
 
       res.render('users/profile', {
         user: getUser(req),
-        userProfile,
+        userProfile: userProfile.toJSON(),
         comments
       })
     } catch (err) {
