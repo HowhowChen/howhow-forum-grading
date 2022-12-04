@@ -17,25 +17,13 @@ const adminController = {
     }
   },
   postRestaurant: async (req, res, next) => {
-    try {
-      const { name, tel, address, openingHours, description, categoryId } = req.body
-      if (!name) throw new Error('Restaurant name is required!')
-      const { file } = req // multer 處理完會放在 req.file
-      const filePath = await imgurFileHandler(file)
-      await Restaurant.create({
-        name,
-        tel,
-        address,
-        openingHours,
-        description,
-        image: filePath || null,
-        categoryId
-      })
+    adminServices.postRestaurant(req, (err, data) => {
+      if (err) return next(err)
       req.flash('success_messages', 'restaurant was successfully created')
+      res.redirect('/admin/restaurants', data)
+      req.session.createData = data
       res.redirect('/admin/restaurants')
-    } catch (err) {
-      next(err)
-    }
+    })
   },
   getRestaurant: async (req, res, next) => {
     try {

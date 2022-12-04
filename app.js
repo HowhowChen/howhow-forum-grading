@@ -23,6 +23,8 @@ app.engine('hbs', handlebars({ extname: '.hbs', helpers: handlebarsHelpers }))
 app.set('view engine', 'hbs')
 //  使用body parser
 app.use(express.urlencoded({ extended: true }))
+// 用於解析JSON格式，前後分離的架構下，前後端約定好以 JSON 格式來交換資料!此時資料格式 (Content-Type) 應為 application/json
+app.use(express.json())
 
 //  設定session
 app.use(session({

@@ -1,4 +1,5 @@
 const { Restaurant, Category } = require('../models')
+const { imgurFileHandler } = require('../helpers/file-helpers')
 
 const adminServices = {
   getRestaurants: async (req, callback) => {
@@ -9,6 +10,26 @@ const adminServices = {
         include: [Category]
       })
       callback(null, { restaurants })
+    } catch (err) {
+      callback(err)
+    }
+  },
+  postRestaurant: async (req, callback) => {
+    try {
+      const { name, tel, address, openingHours, description, categoryId } = req.body
+      if (!name) throw new Error('Restaurant name is required!')
+      const { file } = req // multer 處理完會放在 req.file
+      const filePath = await imgurFileHandler(file)
+      const newRestaurant = await Restaurant.create({
+        name,
+        tel,
+        address,
+        openingHours,
+        description,
+        image: filePath || null,
+        categoryId
+      })
+      callback(null, { newRestaurant })
     } catch (err) {
       callback(err)
     }
