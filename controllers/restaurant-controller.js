@@ -25,10 +25,14 @@ const restaurantController = {
       const favoritedRestaurantsId = req.user && req.user.FavoritedRestaurants.map(fr => ( // 先確認req.user是否存在
         fr.id
       ))
+      const likedRestaurantsId = req.user && req.user.LikedRestaurants.map(fr => (
+        fr.id
+      ))
       const data = restaurants.rows.map(r => ({
         ...r,
         description: r.description.substring(0, 50),
-        isFavorited: favoritedRestaurantsId.includes(r.id)
+        isFavorited: favoritedRestaurantsId.includes(r.id),
+        isLiked: likedRestaurantsId.includes(r.id)
       }))
       res.render('restaurants', {
         restaurants: data,
@@ -47,16 +51,19 @@ const restaurantController = {
         include: [
           Category,
           { model: Comment, include: [User] }, //  eager loading
-          { model: User, as: 'FavoritedUsers' }
+          { model: User, as: 'FavoritedUsers' },
+          { model: User, as: 'LikedUsers' }
         ],
         order: [['createdAt', 'DESC']]
       })
       if (!restaurant) throw new Error("Restaurant didn't exist!")
       await restaurant.increment('viewCounts', { by: 1 })
       const isFavorited = restaurant.FavoritedUsers.some(f => f.id === req.user.id) // 只要符合條件就會立刻回傳true
+      const isLiked = restaurant.LikedUsers.some(f => f.id === req.user.id)
       res.render('restaurant', {
         restaurant: restaurant.toJSON(),
-        isFavorited
+        isFavorited,
+        isLiked
       })
     } catch (err) {
       next(err)

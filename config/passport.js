@@ -33,7 +33,8 @@ passport.deserializeUser(async (id, callback) => {
   try {
     const user = await User.findByPk(id, {
       include: [
-        { model: Restaurant, as: 'FavoritedRestaurants' } // as標明我們在model裡面設定的關係
+        { model: Restaurant, as: 'FavoritedRestaurants' }, // as標明我們在model裡面設定的關係
+        { model: Restaurant, as: 'LikedRestaurants' }
       ]
     })
     callback(null, user.toJSON())
