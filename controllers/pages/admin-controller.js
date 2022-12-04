@@ -1,19 +1,11 @@
+const adminServices = require('../../services/admin-services')
 const { User, Restaurant, Category, sequelize } = require('../../models')
 const { QueryTypes } = require('sequelize')
 const { imgurFileHandler } = require('../../helpers/file-helpers')
 
 const adminController = {
   getRestaurants: async (req, res, next) => {
-    try {
-      const restaurants = await Restaurant.findAll({
-        raw: true,
-        nest: true,
-        include: [Category]
-      })
-      res.render('admin/restaurants', { restaurants })
-    } catch (err) {
-      next(err)
-    }
+    adminServices.getRestaurants(req, (err, data) => err ? next(err) : res.render('admin/restaurants', data))
   },
   createRestaurant: async (req, res, next) => {
     try {
