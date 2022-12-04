@@ -1,10 +1,14 @@
 const express = require('express')
 const router = express.Router()
+const passport = require('../../config/passport')
 const admin = require('./modules/admin')
 const restController = require('../../controllers/apis/restaurant-controller')
+const userController = require('../../controllers/apis/user-controller')
 const { apiErrorHandler } = require('../../middleware/error-handler')
 
 router.use('/admin', admin)
+
+router.post('/signin', passport.authenticate('local', { session: false }), userController.signIn) // 新增這行，設定 disable sessions
 
 router.get('/restaurants', restController.getRestaurants)
 
