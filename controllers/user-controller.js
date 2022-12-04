@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs')
-const { Comment, Restaurant, User, Favorite, Like, sequelize } = require('../models')
+const { Comment, Restaurant, User, Favorite, Like, Followship, sequelize } = require('../models')
 const { QueryTypes } = require('sequelize')
 const { imgurFileHandler } = require('../helpers/file-helpers')
 const { getUser } = require('../helpers/auth-helpers')
@@ -191,6 +191,68 @@ const userController = {
       if (!like) throw new Error("You haven't liked this restaurant!")
       await like.destroy()
       res.redirect('back')
+    } catch (err) {
+      next(err)
+    }
+  },
+  getTopUsers: async (req, res, next) => {
+    try {
+      let users = await User.findAll({
+        include: [
+          { model: User, as: 'Followers' }
+        ]
+      })
+      users = users
+        .map(user => ({
+          ...user.toJSON(),
+          followerCount: user.Followers.length,
+          isFollowed: req.user.Followings.some(f => f.id === user.id)
+        }))
+        .sort((a, b) => b.followerCount - a.followerCount)
+      res.render('top-users', { users })
+    } catch (err) {
+      next(err)
+    }
+  },
+  addFollowing: async (req, res, next) => {
+    try {
+      const { userId } = req.params
+      const [user, followship] = await Promise.all([
+        User.findByPk(userId),
+        Followship.findOne({
+          where: {
+            followerId: req.user.id,
+            followingId: userId
+          }
+        })
+      ])
+      if (!user) throw new Error("User didn't exists!")
+      if (followship) throw new Error('You are already following this user!')
+      await Followship.create({
+        followerId: req.user.id,
+        followingId: userId
+      })
+      res.redirect('/users/top')
+    } catch (err) {
+      next(err)
+    }
+  },
+  removeFollowing: async (req, res, next) => {
+    try {
+      const { userId } = req.params
+      const [user, followship] = await Promise.all([
+        User.findByPk(userId),
+        Followship.findOne({
+          where: {
+            followerId: req.user.id,
+            followingId: userId
+          }
+        })
+      ])
+      if (!user) throw new Error("User didn't exists!")
+      if (!followship) throw new Error("You haven't followed this user!")
+      followship.destroy()
+      res.redirect('/users/top')
     } catch (err) {
       next(err)
     }
