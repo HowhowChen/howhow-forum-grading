@@ -1,6 +1,5 @@
 const adminServices = require('../../services/admin-services')
-const { User, Restaurant, Category, sequelize } = require('../../models')
-const { QueryTypes } = require('sequelize')
+const { User, Restaurant, Category } = require('../../models')
 const { imgurFileHandler } = require('../../helpers/file-helpers')
 
 const adminController = {
@@ -94,22 +93,11 @@ const adminController = {
     }
   },
   deleteRestaurant: async (req, res, next) => {
-    try {
-      const { id } = req.params
-      await sequelize.query(
-        `
-        DELETE FROM Restaurants
-        WHERE id = :id
-        `,
-        {
-          replacements: { id: id },
-          type: QueryTypes.DELETE
-        }
-      )
-      res.redirect('/admin/restaurants')
-    } catch (err) {
-      next(err)
-    }
+    adminServices.deleteRestaurant(req, (err, data) => {
+      if (err) return next(err)
+      res.session.deleteRestaurant = data
+      return res.redirect('/admin/restaurants')
+    })
   },
   getUsers: async (req, res, next) => {
     try {
