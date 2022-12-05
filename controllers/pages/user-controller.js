@@ -1,7 +1,6 @@
 const userServices = require('../../services/user-services')
-const { Comment, Restaurant, User, Favorite, Like, Followship } = require('../../models')
+const { Restaurant, User, Favorite, Like, Followship } = require('../../models')
 const { imgurFileHandler } = require('../../helpers/file-helpers')
-const { getUser } = require('../../helpers/auth-helpers')
 
 const userController = {
   signUpPage: (req, res) => {
@@ -28,39 +27,7 @@ const userController = {
     res.redirect('/signin')
   },
   getUser: async (req, res, next) => {
-    try {
-      const { id } = req.params
-      const user = getUser(req)
-
-      const [userProfile, comments] = await Promise.all([
-        User.findByPk(id, {
-          include: [
-            { model: Restaurant, as: 'FavoritedRestaurants' },
-            { model: User, as: 'Followers' },
-            { model: User, as: 'Followings' }
-          ]
-        }),
-        Comment.findAll({
-          attributes: ['restaurantId'],
-          where: { userId: id },
-          group: 'restaurantId',
-          include: [Restaurant],
-          raw: true,
-          nest: true
-        })
-      ])
-      if (!userProfile) throw new Error("User doesn't exist.")
-      delete userProfile.password
-      delete user.password
-
-      res.render('users/profile', {
-        user: getUser(req),
-        userProfile: userProfile.toJSON(),
-        comments
-      })
-    } catch (err) {
-      next(err)
-    }
+    userServices.getUser(req, (err, data) => err ? next(err) : res.render('users/profile', data))
   },
   editUser: async (req, res, next) => {
     try {

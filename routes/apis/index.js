@@ -14,6 +14,8 @@ router.post('/signin', passport.authenticate('local', { session: false }), userC
 
 router.get('/restaurants', authenticated, restController.getRestaurants)
 
+router.get('/users/:id', authenticated, userController.getUser)
+
 router.use('/', apiErrorHandler)
 
 module.exports = router
