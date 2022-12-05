@@ -14,6 +14,7 @@ router.post('/signup', userController.signUp)
 router.post('/signin', passport.authenticate('local', { session: false }), userController.signIn) // 新增這行，設定 disable sessions
 
 router.get('/restaurants/:id/comment', authenticated, commentController.getComments)
+router.post('/restaurants/:id/comment', authenticated, commentController.postComment)
 router.get('/restaurants/:id', authenticated, restController.getRestaurant)
 router.get('/restaurants', authenticated, restController.getRestaurants)
 
