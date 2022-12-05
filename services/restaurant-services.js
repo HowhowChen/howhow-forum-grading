@@ -1,4 +1,4 @@
-const { Restaurant, Category, User, Comment } = require('../models')
+const { Restaurant, Category, User, Comment, Favorite } = require('../models')
 const { getOffset, getPagination } = require('../helpers/pagination-helper')
 const restaurantController = {
   getRestaurants: async (req, callback) => {
@@ -60,6 +60,51 @@ const restaurantController = {
         isFavorited,
         isLiked
       })
+    } catch (err) {
+      callback(err)
+    }
+  },
+  addFavorited: async (req, callback) => {
+    try {
+      const { id } = req.params
+      const userId = req.user.toJSON().id
+      const [restaurant, favorite] = await Promise.all([
+        Restaurant.findByPk(id),
+        Favorite.findOne({
+          where: {
+            userId,
+            restaurantId: id
+          }
+        })
+      ])
+      if (!restaurant) throw new Error("Restaurant didn't exists!")
+      if (favorite) throw new Error('The restaurant has already favorited!')
+      const favoritedRestaurant = await Favorite.create({
+        userId,
+        restaurantId: id
+      })
+      callback(null, { favoritedRestaurant })
+    } catch (err) {
+      callback(err)
+    }
+  },
+  deleteFavorited: async (req, callback) => {
+    try {
+      const { id } = req.params
+      const userId = req.user.toJSON().id
+      const [restaurant, favorite] = await Promise.all([
+        Restaurant.findByPk(id),
+        Favorite.findOne({
+          where: {
+            userId,
+            restaurantId: id
+          }
+        })
+      ])
+      if (!restaurant) throw new Error("Restaurant didn't exists!")
+      if (!favorite) throw new Error("You haven't favorited this restaurant!")
+      const unfavoritedRestaurant = await favorite.destroy()
+      callback(null, { unfavoritedRestaurant })
     } catch (err) {
       callback(err)
     }

@@ -15,6 +15,8 @@ router.post('/signin', passport.authenticate('local', { session: false }), userC
 
 router.get('/restaurants/:id/comment', authenticated, commentController.getComments)
 router.post('/restaurants/:id/comment', authenticated, commentController.postComment)
+router.post('/restaurants/:id/favorited', authenticated, restController.addFavorited)
+router.delete('/restaurants/:id/favorited', authenticated, restController.deleteFavorited)
 router.get('/restaurants/:id', authenticated, restController.getRestaurant)
 router.get('/restaurants', authenticated, restController.getRestaurants)
 

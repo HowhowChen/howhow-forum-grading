@@ -6,6 +6,12 @@ const restaurantController = {
   },
   getRestaurant: (req, res, next) => {
     restaurantServices.getRestaurant(req, (err, data) => err ? next(err) : res.json({ status: 'success', data }))
+  },
+  addFavorited: (req, res, next) => {
+    restaurantServices.addFavorited(req, (err, data) => err ? next(err) : res.json({ status: 'success', data }))
+  },
+  deleteFavorited: (req, res, next) => {
+    restaurantServices.deleteFavorited(req, (err, data) => err ? next(err) : res.json({ status: 'success', data }))
   }
 }
 
