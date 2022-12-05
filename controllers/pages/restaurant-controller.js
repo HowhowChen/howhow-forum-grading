@@ -6,29 +6,7 @@ const restaurantController = {
     restaurantServices.getRestaurants(req, (err, data) => err ? next(err) : res.render('restaurants', data))
   },
   getRestaurant: async (req, res, next) => {
-    try {
-      const { id } = req.params
-      const restaurant = await Restaurant.findByPk(id, {
-        include: [
-          Category,
-          { model: Comment, include: [User] }, //  eager loading
-          { model: User, as: 'FavoritedUsers' },
-          { model: User, as: 'LikedUsers' }
-        ],
-        order: [['createdAt', 'DESC']]
-      })
-      if (!restaurant) throw new Error("Restaurant didn't exist!")
-      await restaurant.increment('viewCounts', { by: 1 })
-      const isFavorited = restaurant.FavoritedUsers.some(f => f.id === req.user.id) // 只要符合條件就會立刻回傳true
-      const isLiked = restaurant.LikedUsers.some(f => f.id === req.user.id)
-      res.render('restaurant', {
-        restaurant: restaurant.toJSON(),
-        isFavorited,
-        isLiked
-      })
-    } catch (err) {
-      next(err)
-    }
+    restaurantServices.getRestaurant(req, (err, data) => err ? next(err) : res.render('restaurant', data))
   },
   getDashboard: async (req, res, next) => {
     try {

@@ -1,4 +1,4 @@
-const { Restaurant, Category } = require('../models')
+const { Restaurant, Category, User, Comment } = require('../models')
 const { getOffset, getPagination } = require('../helpers/pagination-helper')
 const restaurantController = {
   getRestaurants: async (req, callback) => {
@@ -34,6 +34,31 @@ const restaurantController = {
         categories,
         categoryId,
         pagination: getPagination(limit, page, restaurants.count)
+      })
+    } catch (err) {
+      callback(err)
+    }
+  },
+  getRestaurant: async (req, callback) => {
+    try {
+      const { id } = req.params
+      const restaurant = await Restaurant.findByPk(id, {
+        include: [
+          Category,
+          { model: Comment, include: [User] }, //  eager loading
+          { model: User, as: 'FavoritedUsers' },
+          { model: User, as: 'LikedUsers' }
+        ],
+        order: [['createdAt', 'DESC']]
+      })
+      if (!restaurant) throw new Error("Restaurant didn't exist!")
+      await restaurant.increment('viewCounts', { by: 1 })
+      const isFavorited = restaurant.FavoritedUsers.some(f => f.id === req.user.id) // 只要符合條件就會立刻回傳true
+      const isLiked = restaurant.LikedUsers.some(f => f.id === req.user.id)
+      callback(null, {
+        restaurant: restaurant.toJSON(),
+        isFavorited,
+        isLiked
       })
     } catch (err) {
       callback(err)
