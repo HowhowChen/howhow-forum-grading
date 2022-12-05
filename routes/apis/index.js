@@ -18,6 +18,8 @@ router.post('/restaurants/:id/comment', authenticated, commentController.postCom
 router.get('/restaurants/:id', authenticated, restController.getRestaurant)
 router.get('/restaurants', authenticated, restController.getRestaurants)
 
+router.delete('/comments/:id', authenticated, commentController.deleteComment)
+
 router.get('/users/:id', authenticated, userController.getUser)
 
 router.get('*', (req, res, next) => {
