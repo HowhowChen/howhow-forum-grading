@@ -36,6 +36,26 @@ const commentServices = {
       callback(err)
     }
   },
+  putComment: async (req, callback) => {
+    try {
+      const { id } = req.params
+      const userId = req.user.toJSON().id
+      const { text } = req.body
+      const comment = await Comment.findOne({
+        where: {
+          id,
+          userId
+        }
+      })
+      if (!comment) throw new Error("comment didn't exists!")
+      const updateComment = await comment.update({
+        text
+      })
+      callback(null, { updateComment })
+    } catch (err) {
+      callback(err)
+    }
+  },
   deleteComment: async (req, callback) => {
     try {
       const { id } = req.params
