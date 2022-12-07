@@ -1,8 +1,10 @@
 const passport = require('../config/passport') // 引入 passport
 const authenticated = (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
-    if (err || !user) return res.status(401).json({ stauts: 'error', message: 'unauthorized' })
-    req.user = user // 沒放會出錯!!!
+    if (!user) return res.status(401).json({ stauts: 'error', message: 'unauthorized' })
+    req.logIn(user, (error = err) => {
+      if (error) next(error)
+    })
     next()
   })(req, res, next)
 }
