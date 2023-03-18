@@ -1,9 +1,8 @@
-{
-  "development": {
+module.exports = { "development": {
     "username": "root",
     "password": "password",
     "database": "forum",
-    "host": "127.0.0.1",
+    "host": "localhost",
     "dialect": "mysql"
   },
   "production": {
