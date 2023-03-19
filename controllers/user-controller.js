@@ -58,9 +58,9 @@ const userController = {
           ]
         }),
         Comment.findAll({
-          attributes: ['restaurantId'],
+          attributes: ['Restaurant.id'],
           where: { userId: id },
-          group: 'restaurantId',
+          group: 'Restaurant.id',
           include: [Restaurant],
           raw: true,
           nest: true
