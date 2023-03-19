@@ -12,10 +12,11 @@ const userController = {
     try {
       const { name, email, password } = req.body
       const user = await sequelize.query(
-        `SELECT * FROM Users
-        WHERE email = '${email}'`,
+        `SELECT * FROM "Users"
+        WHERE email = $1`,
         {
-          type: QueryTypes.SELECT
+          type: QueryTypes.SELECT,
+          bind: [email]
         }
       )
 
