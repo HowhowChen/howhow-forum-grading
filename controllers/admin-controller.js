@@ -106,11 +106,11 @@ const adminController = {
       const { id } = req.params
       await sequelize.query(
         `
-        DELETE FROM Restaurants
-        WHERE id = :id
+        DELETE FROM "Restaurants"
+        WHERE id = $1
         `,
         {
-          replacements: { id: id },
+          bind: [id],
           type: QueryTypes.DELETE
         }
       )
