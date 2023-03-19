@@ -134,15 +134,14 @@ const restaurantController = {
             [
               sequelize.literal(`(
                 SELECT COUNT(*)
-                FROM Favorites
-                AS Favorite
-                WHERE Favorite.restaurant_id = Restaurant.id
+                FROM "Favorites"
+                WHERE "Favorites"."restaurant_id" = "Restaurant"."id"
               )`), 'favoritedCount'
             ]
           ]
         },
         order: [
-          [sequelize.literal('favoritedCount'), 'DESC']
+          [sequelize.literal('"favoritedCount"'), 'DESC']
         ],
         limit: 10
       })

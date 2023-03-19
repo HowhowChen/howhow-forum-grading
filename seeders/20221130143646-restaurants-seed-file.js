@@ -1,17 +1,16 @@
 'use strict'
 const faker = require('faker')
-const { Category } = require('../models')
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    // const categories = await queryInterface.sequelize.query(
-    //   `
-    //   SELECT * FROM 'Categories';
-    //   `,
-    //   {
-    //     type: queryInterface.sequelize.QueryTypes.SELECT
-    //   }
-    // )
-    const categories = await Category.findAll({ raw: true })
+    const categories = await queryInterface.sequelize.query(
+      `
+      SELECT * FROM "Categories";
+      `,
+      {
+        type: queryInterface.sequelize.QueryTypes.SELECT
+      }
+    )
 
     await queryInterface.bulkInsert('Restaurants',
       Array.from({ length: 50 }, () => ({

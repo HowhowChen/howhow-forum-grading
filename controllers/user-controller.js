@@ -66,6 +66,7 @@ const userController = {
           nest: true
         })
       ])
+
       if (!userProfile) throw new Error("User doesn't exist.")
       delete userProfile.password
       delete user.password

@@ -65,7 +65,7 @@
     <div class="card-body bg-white d-flex flex-row flex-wrap">
       {{#if comments.length}}
         {{#each comments}}
-          <a href="/restaurants/{{this.restaurantId}}" alt="{{this.Restaurant.name}}">
+          <a href="/restaurants/{{this.id}}" alt="{{this.Restaurant.name}}">
             <img class="rounded m-2" src="{{this.Restaurant.image}}" width="80px" height="80px" title="{{this.Restaurant.name}}">
           </a>
         {{/each}}
